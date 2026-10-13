@@ -1,0 +1,4 @@
+import jwt from 'jsonwebtoken';
+export function auth(req,res,next){try{const token=(req.headers.authorization||'').replace(/^Bearer\s+/i,'');if(!token) return res.status(401).json({message:'Please sign in to continue.'});req.user=jwt.verify(token,process.env.JWT_SECRET);next()}catch{return res.status(401).json({message:'Your session has expired. Please sign in again.'})}}
+export function admin(req,res,next){if(req.user?.role!=='admin')return res.status(403).json({message:'Administrator access required.'});next()}
+export function errorHandler(err,req,res,next){console.error(err);if(err.code===11000)return res.status(409).json({message:'That record already exists.'});if(err.name==='ValidationError')return res.status(400).json({message:err.message});res.status(err.status||500).json({message:err.message||'Something went wrong.'})}

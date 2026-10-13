@@ -1,0 +1,9 @@
+import mongoose from 'mongoose';
+const { Schema, model } = mongoose;
+const userSchema = new Schema({ name:{type:String,required:true,trim:true}, email:{type:String,required:true,unique:true,lowercase:true,trim:true}, password:{type:String,required:true,select:false}, role:{type:String,enum:['admin','user'],default:'user'} },{timestamps:true});
+const vehicleSchema = new Schema({ owner:{type:Schema.Types.ObjectId,ref:'User',required:true}, ownerName:{type:String,required:true,trim:true}, plate:{type:String,required:true,uppercase:true,trim:true}, type:{type:String,enum:['Car','Motorcycle','EV','SUV'],default:'Car'} },{timestamps:true});
+vehicleSchema.index({owner:1,plate:1},{unique:true});
+const slotSchema = new Schema({ code:{type:String,required:true,unique:true,uppercase:true,trim:true}, zone:{type:String,default:'A'}, level:{type:String,default:'Ground'}, type:{type:String,enum:['Standard','Compact','EV','Accessible'],default:'Standard'}, status:{type:String,enum:['available','occupied','maintenance'],default:'available'}, hourlyRate:{type:Number,default:4,min:0} },{timestamps:true});
+const bookingSchema = new Schema({ user:{type:Schema.Types.ObjectId,ref:'User',required:true}, vehicle:{type:Schema.Types.ObjectId,ref:'Vehicle',required:true}, slot:{type:Schema.Types.ObjectId,ref:'ParkingSlot',required:true}, bookingDate:{type:Date,required:true}, entryTime:{type:Date,required:true}, exitTime:{type:Date}, plannedExitTime:{type:Date,required:true}, status:{type:String,enum:['active','completed','cancelled'],default:'active'}, amount:{type:Number,default:0} },{timestamps:true});
+bookingSchema.index({slot:1,status:1});
+export const User=model('User',userSchema); export const Vehicle=model('Vehicle',vehicleSchema); export const ParkingSlot=model('ParkingSlot',slotSchema); export const Booking=model('Booking',bookingSchema);
